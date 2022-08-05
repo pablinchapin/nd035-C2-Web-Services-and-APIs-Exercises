@@ -5,10 +5,9 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.udacity.vehicles.client.maps.MapsClient;
-import com.udacity.vehicles.client.prices.PriceClient;
 import com.udacity.vehicles.domain.Condition;
 import com.udacity.vehicles.domain.Location;
 import com.udacity.vehicles.domain.car.Car;
@@ -48,11 +47,6 @@ public class CarControllerTest {
     @MockBean
     private CarService carService;
 
-    @MockBean
-    private PriceClient priceClient;
-
-    @MockBean
-    private MapsClient mapsClient;
 
     /**
      * Creates pre-requisites for testing, such as an example car.
@@ -108,6 +102,24 @@ public class CarControllerTest {
         Car car = getCar();
         mvc.perform(
                 get("/cars/{id}", car.getId())
+                    .content(json.write(car).getJson())
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .accept(MediaType.APPLICATION_JSON_UTF8)
+            )
+            .andExpect(status().isOk());
+    }
+
+    /**
+     * Tests update a car by ID.
+     * @throws Exception if the update operation of a vehicle fails
+     */
+    @Test
+    public void updateCar() throws Exception {
+
+        Car car = getCar();
+        car.setId(1L);
+        mvc.perform(
+                put("/cars/{id}", car.getId())
                     .content(json.write(car).getJson())
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .accept(MediaType.APPLICATION_JSON_UTF8)
